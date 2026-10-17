@@ -1,0 +1,61 @@
+﻿class_name,year,area_km2,region
+Bare land,2001,613464.9384610524,Aral Sea Basin
+Bare land,2005,580519.7390801727,Aral Sea Basin
+Bare land,2010,553834.9092086513,Aral Sea Basin
+Bare land,2015,548760.4979633788,Aral Sea Basin
+Bare land,2020,555510.8352422921,Aral Sea Basin
+Bare land,2024,574738.4681877308,Aral Sea Basin
+Cropland,2001,115160.72134229724,Aral Sea Basin
+Cropland,2005,113780.06226176488,Aral Sea Basin
+Cropland,2010,105787.4471299676,Aral Sea Basin
+Cropland,2015,109188.33293498396,Aral Sea Basin
+Cropland,2020,112860.3025822874,Aral Sea Basin
+Cropland,2024,112971.9024749303,Aral Sea Basin
+Forest,2001,6772.693663530997,Aral Sea Basin
+Forest,2005,7334.8021882284,Aral Sea Basin
+Forest,2010,10360.647641423264,Aral Sea Basin
+Forest,2015,6837.075814466802,Aral Sea Basin
+Forest,2020,7732.496246499031,Aral Sea Basin
+Forest,2024,8169.892083875682,Aral Sea Basin
+Grassland,2001,394602.6346958927,Aral Sea Basin
+Grassland,2005,419216.3467383423,Aral Sea Basin
+Grassland,2010,443439.6519627919,Aral Sea Basin
+Grassland,2015,448691.9714036606,Aral Sea Basin
+Grassland,2020,433888.64317437424,Aral Sea Basin
+Grassland,2024,417224.9214783981,Aral Sea Basin
+Impervious,2001,4511.23701179176,Aral Sea Basin
+Impervious,2005,6503.24142954855,Aral Sea Basin
+Impervious,2010,9270.079077447888,Aral Sea Basin
+Impervious,2015,12494.09973639046,Aral Sea Basin
+Impervious,2020,14242.058335514512,Aral Sea Basin
+Impervious,2024,17088.671378496623,Aral Sea Basin
+Shrubland,2001,1973.9837999636006,Aral Sea Basin
+Shrubland,2005,2930.6900320552813,Aral Sea Basin
+Shrubland,2010,4425.43005489487,Aral Sea Basin
+Shrubland,2015,4533.273291387925,Aral Sea Basin
+Shrubland,2020,3506.2257154017566,Aral Sea Basin
+Shrubland,2024,3851.4437103573705,Aral Sea Basin
+Snow/Ice,2001,18160.01009535172,Aral Sea Basin
+Snow/Ice,2005,21844.92286420592,Aral Sea Basin
+Snow/Ice,2010,25660.83399345352,Aral Sea Basin
+Snow/Ice,2015,22334.17717351301,Aral Sea Basin
+Snow/Ice,2020,25326.80629124213,Aral Sea Basin
+Snow/Ice,2024,19675.37559988982,Aral Sea Basin
+Tundra,2001,0.0,Aral Sea Basin
+Tundra,2005,0.0,Aral Sea Basin
+Tundra,2010,6.18581440902303,Aral Sea Basin
+Tundra,2015,0.0,Aral Sea Basin
+Tundra,2020,0.0,Aral Sea Basin
+Tundra,2024,0.0,Aral Sea Basin
+Water,2001,10855.309716174012,Aral Sea Basin
+Water,2005,12380.47920155109,Aral Sea Basin
+Water,2010,12338.691294846854,Aral Sea Basin
+Water,2015,11598.549081406769,Aral Sea Basin
+Water,2020,11898.120138013368,Aral Sea Basin
+Water,2024,11805.607989346548,Aral Sea Basin
+Wetland,2001,3257.6648270644696,Aral Sea Basin
+Wetland,2005,4248.909817249531,Aral Sea Basin
+Wetland,2010,3635.317435232955,Aral Sea Basin
+Wetland,2015,4321.21621393057,Aral Sea Basin
+Wetland,2020,3793.7058874942336,Aral Sea Basin
+Wetland,2024,3232.9107100937035,Aral Sea Basin
