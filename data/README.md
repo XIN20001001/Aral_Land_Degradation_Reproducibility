@@ -1,6 +1,6 @@
 # Data inventory and provenance
 
-`figure_source/` contains actual research outputs copied from the working project. These are inputs to the figure renderer and verification script, not simulated examples. Checksums appear in `source_manifest.csv`.
+`figure_source/` contains the research outputs used by the figure renderer and verification script.
 
 | Archived file(s) | Original project output | Scope |
 |---|---|---|

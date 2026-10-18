@@ -41,15 +41,12 @@ import rasterio
 from rasterio.windows import Window
 
 
-# =============================================================================
-# 1. PATHS
-# =============================================================================
 ROOT = Path(__file__).resolve().parents[2]
 
 MESMA_DIR = ROOT / "data/raw/annual_mesma"
 WATER_TABLE = ROOT / "data/figure_source/water_annual_shrinkage.csv"
 
-# Exact persistent-event output produced by Figure 5.
+
 FIG5_OUTDIR = ROOT / "outputs/full/figure5"
 FIG5_EVENT_YEAR = FIG5_OUTDIR / "Figure5_persistent_event_year.tif"
 if not FIG5_EVENT_YEAR.exists():
@@ -75,9 +72,6 @@ BLOCK_HEIGHT = 128
 FORCE_RECOMPUTE = False
 
 
-# =============================================================================
-# 2. BASIC CHECKS AND HELPERS
-# =============================================================================
 def ensure_dirs() -> None:
     for path in [OUTDIR, RASTER_DIR, TABLE_DIR, FIGDIR]:
         path.mkdir(parents=True, exist_ok=True)
@@ -175,9 +169,6 @@ def infer_scale_factor(src: rasterio.io.DatasetReader) -> float:
     raise RuntimeError(f"Unexpected MESMA scale, 99th percentile = {q99:.3f}")
 
 
-# =============================================================================
-# 3. EXACT TWO-SIDED PEARSON P VALUES
-# =============================================================================
 def betacf_array(a: float, b: float, x: np.ndarray) -> np.ndarray:
     if x.size == 0:
         return x
@@ -273,9 +264,6 @@ def pixel_stats(y: np.ndarray, x: np.ndarray) -> tuple[np.ndarray, np.ndarray, n
     return slope, r, p, n
 
 
-# =============================================================================
-# 4. CALCULATION
-# =============================================================================
 def expected_outputs() -> list[Path]:
     return [
         stat_raster(component, stat)
@@ -344,7 +332,7 @@ def compute_correlations() -> None:
                 data = np.stack(stacks[component], axis=0)
                 slope, r, p, n = pixel_stats(data, shrinkage)
 
-                # Reinforce the exact Figure 5 persistent-event domain.
+
                 slope[~persistent_mask] = np.nan
                 r[~persistent_mask] = np.nan
                 p[~persistent_mask] = np.nan
@@ -358,9 +346,6 @@ def compute_correlations() -> None:
             print(f"Processed rows {row0:,} to {row0 + h - 1:,} of {height:,}", flush=True)
 
 
-# =============================================================================
-# 5. SUMMARY
-# =============================================================================
 def summarize_outputs() -> pd.DataFrame:
     rows = []
     with rasterio.open(FIG5_EVENT_YEAR) as evt:
@@ -408,9 +393,6 @@ def summarize_outputs() -> pd.DataFrame:
     return frame
 
 
-# =============================================================================
-# 6. MAP BOUNDARIES
-# =============================================================================
 def load_boundaries():
     import geopandas as gpd
     countries = gpd.read_file(COUNTRY_SHP) if COUNTRY_SHP.exists() else None
@@ -484,9 +466,6 @@ def read_raster(path: Path) -> tuple[np.ndarray, list[float]]:
     return arr, extent
 
 
-# =============================================================================
-# 7. FIGURE
-# =============================================================================
 def make_figure() -> Path:
     plt.rcParams.update(
         {
@@ -581,9 +560,6 @@ def make_figure() -> Path:
     return stem
 
 
-# =============================================================================
-# 8. METHOD NOTE
-# =============================================================================
 def write_method_note(summary: pd.DataFrame, figure_stem: Path) -> None:
     text = f"""# Figure 7 persistent degradation coupling
 
@@ -619,9 +595,6 @@ Summary
     (OUTDIR / "Figure7_method_note.md").write_text(text, encoding="utf-8")
 
 
-# =============================================================================
-# 9. MAIN
-# =============================================================================
 def main() -> None:
     ensure_dirs()
     validate_inputs()

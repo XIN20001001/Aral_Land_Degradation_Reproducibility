@@ -40,22 +40,15 @@ from rasterio.windows import Window
 from shapely.geometry import box, mapping
 
 
-# -----------------------------------------------------------------------------
-# Standalone map helpers
-# -----------------------------------------------------------------------------
-# The earlier Figure 3 script imported helper functions from
-# ``aral_fromglc30_transition_composite.py``.  This persistence version is
-# intentionally self-contained so it can run directly from the tools folder.
-
-COUNTRY_BOUNDARY_PATH = None  # Optional: set to a country-boundary shapefile if desired.
+COUNTRY_BOUNDARY_PATH = None
 
 def pretty_region(value: object) -> str:
     """Return a clean display name for a subbasin label."""
     if value is None:
         return "Unknown"
     raw = str(value).strip()
-    # Remove suffixes such as ``(ex 2161)`` that are present in some
-    # SUBREGNAME values, then normalize spacing/case for plotting and tables.
+
+
     name = re.sub(r"\s*\(ex\s*\d+\)\s*$", "", raw, flags=re.IGNORECASE).strip()
     key = re.sub(r"[^A-Za-z]+", " ", name).strip().lower()
     replacements = {
@@ -94,8 +87,7 @@ def map_grid_geometry(
         dx = abs(ref.transform.a) * step
         dy = abs(ref.transform.e) * step
 
-    # Snap the plotting extent to the display grid so tile placement and the
-    # basin mask share exactly the same dimensions.
+
     xmin = math.floor(xmin / dx) * dx
     ymin = math.floor(ymin / dy) * dy
     xmax = math.ceil(xmax / dx) * dx
@@ -152,7 +144,7 @@ def draw_boundaries_and_grid(
                 continue
             p = geom.representative_point()
             label = pretty_region(row[name_col])
-            # Match the compact line wrapping used in the existing figure.
+
             if label in {"Aral Sea North", "Aral Sea South"}:
                 label = label.replace(" Sea ", " Sea\n")
             ax.text(
@@ -173,8 +165,8 @@ def draw_boundaries_and_grid(
 ROOT = Path(__file__).resolve().parents[2]
 FROMGLC_DIR = ROOT / "data/raw/FROMGLC30_V002"
 SUBBASINS = ROOT / "data/boundaries/AralSeaBasinS.shp"
-# The archived final water-union mask is the input to downstream land analyses.
-# Its upstream delineation is outside this compact reproducibility package.
+
+
 OUTDIR = ROOT / "outputs/full/figure3"
 FIGDIR = ROOT / "outputs/full/figure3"
 ARAL_MASK_30M = ROOT / "data/figure_source/aral_water_union_30m.tif"
@@ -189,19 +181,11 @@ PERIODS = [
     (2001, 2024, "2001-2024"),
 ]
 
-# Initial temporal-persistence rule. A candidate change in year t is retained
-# only if the source class occurred in the two immediately preceding years and
-# the target class remains unchanged in t, t+1, and t+2. Therefore the earliest
-# detectable transition year is 2003 and the latest is 2022.
+
 SOURCE_STABLE_YEARS = 2
 TARGET_PERSIST_YEARS = 3
 
-# Recent-state confirmation. For transitions established on or before 2020, at
-# least 4 of the five years 2020-2024 must confirm the persistent state. For
-# transitions established in 2021 or 2022, only post-transition years are used;
-# at least 80% of the available years must confirm persistence, with a minimum
-# of three observations. This avoids automatically rejecting a 2022 transition
-# simply because 2025-2026 observations do not yet exist.
+
 RECENT_STATE_START = 2020
 RECENT_STATE_END = 2024
 RECENT_STATE_FRACTION = 0.80
@@ -233,17 +217,17 @@ CLASS_CODES = {
 
 TRANSITION_RULES = {
     "Natural-cover degradation": {
-        (20, 30),  # Forest -> Grassland
-        (40, 30),  # Shrubland -> Grassland
-        (20, 90),  # Vegetation -> Bare land
+        (20, 30),
+        (40, 30),
+        (20, 90),
         (30, 90),
         (40, 90),
-        (50, 90),  # Wetland -> Bare land
+        (50, 90),
     },
     "Land-use intensification": {
-        (30, 10),  # Grassland -> Cropland
-        (20, 10),  # Forest -> Cropland
-        (50, 10),  # Wetland -> Cropland
+        (30, 10),
+        (20, 10),
+        (50, 10),
     },
 }
 HYDRO_TARGETS = {90, 30, 10}
@@ -569,7 +553,7 @@ def full_resolution_statistics(files: dict[int, dict[str, Path]]) -> pd.DataFram
                         area_rows = row_pixel_areas(transform, height)
                         weights = np.broadcast_to(area_rows[:, None], (height, width))
 
-                        # Annual establishment areas are useful for diagnostics and optional trend analysis.
+
                         for year in range(ALL_YEARS[0], ALL_YEARS[-1] + 1):
                             year_mask = basin_mask & (event_year == year)
                             if not year_mask.any():

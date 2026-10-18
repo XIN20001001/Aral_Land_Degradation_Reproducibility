@@ -57,4 +57,4 @@ The archived research-generated inputs in `data/figure_source/` are listed in [d
 
 ## Availability and citation
 
-This public repository contains the figure-source data, derived tables, spatial outputs, and analysis scripts described above. The manuscript links directly to [this repository](https://github.com/XIN20001001/Aral_Land_Degradation_Reproducibility) in its Data Availability Statement. Citation metadata is provided in `CITATION.cff`. A versioned archival DOI has not yet been assigned; update the manuscript citation and this file when an archived release receives one.
+This public repository contains the figure-source data, derived tables, spatial outputs, and analysis scripts described above. The manuscript links directly to [this repository](https://github.com/XIN20001001/Aral_Land_Degradation_Reproducibility) in its Data Availability Statement. A versioned archival DOI has not yet been assigned; add it to the manuscript citation when available.

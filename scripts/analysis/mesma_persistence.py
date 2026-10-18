@@ -55,10 +55,6 @@ from rasterio.windows import Window
 from shapely.geometry import mapping
 
 
-# =============================================================================
-# 1. PATHS
-# =============================================================================
-
 ROOT = Path(__file__).resolve().parents[2]
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
@@ -70,16 +66,12 @@ MESMA_DIR = ROOT / "data/raw/annual_mesma"
 BASIN_SHP = ROOT / "data/boundaries/AralSeaBasinS.shp"
 COUNTRIES_SHP = ROOT / "data/boundaries/countries.shp"
 
-# Final observed-water union used in the Figure 3 workflow.
+
 ARAL_MASK_30M = ROOT / "data/figure_source/aral_water_union_30m.tif"
 
 OUTDIR = ROOT / "outputs/full/figure5"
 FIGDIR = ROOT / "outputs/full/figure5"
 
-
-# =============================================================================
-# 2. ANALYSIS SETTINGS
-# =============================================================================
 
 ALL_YEARS = list(range(2001, 2025))
 
@@ -92,7 +84,7 @@ PERIODS = [
     (2001, 2024, "2001-2024"),
 ]
 
-# Same temporal architecture as the Figure 3 persistent-transition workflow.
+
 SOURCE_STABLE_YEARS = 2
 TARGET_PERSIST_YEARS = 3
 
@@ -101,63 +93,31 @@ RECENT_STATE_END = 2024
 RECENT_STATE_FRACTION = 0.80
 RECENT_STATE_MIN_OBS = 3
 
-# Continuous-variable thresholds, all expressed in percentage points.
-#
-# SOURCE_STABILITY_PP:
-# The year-to-year difference during the two-year source period must not exceed
-# this threshold for BS, PV or NPV.
-#
-# MIN_ONSET_COMPONENT_PP:
-# The mean magnitude of the dominant degradation component during the initial
-# three-year target period must reach at least this value.
-#
-# RETAIN_FRACTION:
-# During each target year and during recent-state confirmation, the dominant
-# pathway must retain at least this fraction of its initial mean magnitude.
-#
-# RETAIN_FLOOR_PP:
-# The retention threshold is never allowed to fall below this absolute value.
+
 SOURCE_STABILITY_PP = 5.0
 MIN_ONSET_COMPONENT_PP = 5.0
 RETAIN_FRACTION = 0.50
 RETAIN_FLOOR_PP = 2.5
 
-# Exclusion options:
-#
-# "water_union_2001_2024"
-#     Excludes the 2001-2024 water-union mask used in Figure 3.
-#     This is the intended setting for Figure 5.
-#
-# "none"
-#     Does not exclude an Aral Sea footprint.
+
 EXCLUSION_MODE = "water_union_2001_2024"
 
-# Native-grid processing block.
+
 BLOCK_SIZE = 512
 
-# Limit only the DISPLAY resolution. Statistics always use the native grid.
+
 DISPLAY_MAX_DIM = 2400
 
-# Set to True after changing event-detection logic and wanting a clean rerun.
+
 FORCE_RECOMPUTE = False
 
 
-# =============================================================================
-# 3. MESMA BAND SETTINGS
-# =============================================================================
-
-# Leave as None for automatic detection.
-# If automatic detection fails, set the 1-based rasterio band numbers here.
 BAND_INDEX_OVERRIDE = {
     "BS": None,
     "PV": None,
     "NPV": None,
 }
 
-
-# =============================================================================
-# 4. COLOURS AND PLOT STYLE
-# =============================================================================
 
 COLORS = {
     "BS": np.array([0xD5, 0x5E, 0x00], dtype=np.float32) / 255.0,
@@ -199,10 +159,6 @@ mpl.rcParams.update(
     }
 )
 
-
-# =============================================================================
-# 5. BASIC HELPERS
-# =============================================================================
 
 def annual_raster(year: int) -> Path:
     return MESMA_DIR / f"Aral_MESMA_Degradation_{year}.tif"
@@ -303,8 +259,8 @@ def resolve_band_indices(src: rasterio.io.DatasetReader) -> dict[str, int]:
 
     if missing:
         if src.count >= 5:
-            # Known GEE MESMA image order:
-            # DA, NPV, IS, BS, PV
+
+
             fallback = {"NPV": 2, "BS": 4, "PV": 5}
             for key in list(missing):
                 result[key] = fallback[key]
@@ -429,10 +385,6 @@ def period_mask(
     return (event_year >= start) & (event_year <= end)
 
 
-# =============================================================================
-# 6. ARAL WATER EXCLUSION
-# =============================================================================
-
 def exclusion_mask_for_window(
     ref: rasterio.io.DatasetReader,
     window: Window,
@@ -467,10 +419,6 @@ def exclusion_mask_for_window(
 
     raise RuntimeError("Unexpected exclusion mode.")
 
-
-# =============================================================================
-# 7. MESMA COMPONENT DEFINITION
-# =============================================================================
 
 def degradation_components_from_baseline(
     baseline_bs: np.ndarray,
@@ -510,10 +458,6 @@ def degradation_components_from_baseline(
         senescence.astype(np.float32),
     )
 
-
-# =============================================================================
-# 8. PERSISTENT EVENT DETECTION
-# =============================================================================
 
 def detect_persistent_mesma_event(
     bs_stack: np.ndarray,
@@ -603,15 +547,14 @@ def detect_persistent_mesma_event(
             )
             target_components.append(np.stack(comps, axis=0))
 
-        # Shape:
-        # component, target_year, row, column
+
         target_components = np.stack(target_components, axis=1)
 
         mean_components = np.nanmean(target_components, axis=1)
         dominant_idx = np.argmax(mean_components, axis=0)
         dominant_strength = np.max(mean_components, axis=0)
 
-        # Each of the three target years must preserve the same dominant pathway.
+
         selected_target = np.take_along_axis(
             target_components,
             dominant_idx[None, None, :, :],
@@ -640,7 +583,7 @@ def detect_persistent_mesma_event(
         if not candidate.any():
             continue
 
-        # Recent-state confirmation follows the Figure 3 architecture.
+
         recent_start_year = max(RECENT_STATE_START, transition_year)
         recent_years = [
             year
@@ -711,10 +654,6 @@ def detect_persistent_mesma_event(
     return event_year, event_bs, event_pv, event_sen
 
 
-# =============================================================================
-# 9. AREA WEIGHTS
-# =============================================================================
-
 def geographic_row_areas_km2(
     transform: rasterio.Affine,
     height: int,
@@ -757,10 +696,6 @@ def pixel_area_weights_km2(
     return np.full((h, w), pixel_area, dtype=np.float64)
 
 
-# =============================================================================
-# 10. CACHE SIGNATURE
-# =============================================================================
-
 def analysis_signature() -> dict:
     return {
         "years": [ALL_YEARS[0], ALL_YEARS[-1]],
@@ -790,10 +725,6 @@ def cache_matches(marker: Path) -> bool:
 
     return saved == analysis_signature()
 
-
-# =============================================================================
-# 11. FULL NATIVE-GRID ANALYSIS
-# =============================================================================
 
 def output_paths() -> tuple[Path, Path, Path]:
     event_year_path = OUTDIR / "Figure5_persistent_event_year.tif"
@@ -902,7 +833,7 @@ def process_native_grid() -> tuple[Path, Path, pd.DataFrame]:
         component_dst.set_band_description(2, "Green vegetation loss")
         component_dst.set_band_description(3, "Vegetation senescence")
 
-        # Statistics containers.
+
         period_stats = {
             label: {
                 "total_area": 0.0,
@@ -1029,7 +960,7 @@ def process_native_grid() -> tuple[Path, Path, pd.DataFrame]:
                     pv *= factor
                     npv *= factor
 
-                    # Fractions should remain physically plausible.
+
                     valid &= (
                         (bs >= -1.0)
                         & (bs <= 101.0)
@@ -1099,7 +1030,7 @@ def process_native_grid() -> tuple[Path, Path, pd.DataFrame]:
                     axis=0,
                 )
 
-                # Annual event-establishment statistics.
+
                 for year in ALL_YEARS:
                     mask = event_valid & (event_year == year)
 
@@ -1116,7 +1047,7 @@ def process_native_grid() -> tuple[Path, Path, pd.DataFrame]:
                                 weights[pathway_mask].sum()
                             )
 
-                # Period statistics.
+
                 for start, end, label in PERIODS:
                     mask = event_valid & period_mask(
                         event_year,
@@ -1143,7 +1074,7 @@ def process_native_grid() -> tuple[Path, Path, pd.DataFrame]:
                             np.sum(values[mask] * weights[mask])
                         )
 
-                    # Subbasin area shares.
+
                     for region_id, _, _ in region_records:
                         region_mask = mask & (region_ids == region_id)
 
@@ -1169,9 +1100,6 @@ def process_native_grid() -> tuple[Path, Path, pd.DataFrame]:
                         flush=True,
                     )
 
-    # -------------------------------------------------------------------------
-    # Export period statistics.
-    # -------------------------------------------------------------------------
 
     period_rows = []
 
@@ -1212,9 +1140,6 @@ def process_native_grid() -> tuple[Path, Path, pd.DataFrame]:
         encoding="utf-8-sig",
     )
 
-    # -------------------------------------------------------------------------
-    # Export annual establishment statistics.
-    # -------------------------------------------------------------------------
 
     annual_rows = []
 
@@ -1246,9 +1171,6 @@ def process_native_grid() -> tuple[Path, Path, pd.DataFrame]:
         encoding="utf-8-sig",
     )
 
-    # -------------------------------------------------------------------------
-    # Export subbasin statistics.
-    # -------------------------------------------------------------------------
 
     region_rows_out = []
 
@@ -1298,10 +1220,6 @@ def process_native_grid() -> tuple[Path, Path, pd.DataFrame]:
 
     return event_year_path, component_path, period_frame
 
-
-# =============================================================================
-# 12. SHARED COLOUR STRENGTH
-# =============================================================================
 
 def full_resolution_strength_p95(
     component_path: Path,
@@ -1356,10 +1274,6 @@ def full_resolution_strength_p95(
 
     return float((bin_edges[idx] + bin_edges[idx + 1]) / 2.0)
 
-
-# =============================================================================
-# 13. DISPLAY ARRAYS
-# =============================================================================
 
 def display_shape(src: rasterio.io.DatasetReader) -> tuple[int, int]:
     scale = min(
@@ -1419,10 +1333,6 @@ def load_display_event_arrays(
     )
 
 
-# =============================================================================
-# 14. TERNARY RGB
-# =============================================================================
-
 def rgb_from_components(
     bs: np.ndarray,
     pv: np.ndarray,
@@ -1464,7 +1374,7 @@ def rgb_from_components(
         1.0,
     )
 
-    # Same visual compression used in the current Figure 5.
+
     strength = np.sqrt(strength)
 
     base = np.array(
@@ -1481,10 +1391,6 @@ def rgb_from_components(
 
     return np.clip(rgb, 0.0, 1.0)
 
-
-# =============================================================================
-# 15. TERNARY KEY
-# =============================================================================
 
 def ternary_key(
     ax: plt.Axes,
@@ -1579,10 +1485,6 @@ def ternary_key(
     ax.set_ylim(-0.10, h + 0.16)
     ax.axis("off")
 
-
-# =============================================================================
-# 16. PANEL G
-# =============================================================================
 
 def stacked_summary(
     ax: plt.Axes,
@@ -1681,10 +1583,6 @@ def stacked_summary(
         fontsize=8.4,
     )
 
-
-# =============================================================================
-# 17. FINAL FIGURE
-# =============================================================================
 
 def make_figure(
     event_year_path: Path,
@@ -1922,10 +1820,6 @@ def make_figure(
     return stem
 
 
-# =============================================================================
-# 18. METHOD REPORT
-# =============================================================================
-
 def write_method_report(
     summary: pd.DataFrame,
     figure_stem: Path,
@@ -1991,10 +1885,6 @@ The current script setting uses ARAL_MASK_30M, that is the 2001-2024 water-union
         encoding="utf-8",
     )
 
-
-# =============================================================================
-# 19. MAIN
-# =============================================================================
 
 def main() -> None:
     OUTDIR.mkdir(parents=True, exist_ok=True)
